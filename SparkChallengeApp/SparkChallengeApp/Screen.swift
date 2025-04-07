@@ -8,20 +8,15 @@
 
 // Screen.swift
 enum Screen: Hashable {
+    case moodCheckIn
+    case moodCheckIn2
     case explanation(mood: Int)
     case suggestion(text: String)
     case steps
     case actionPlan(suggestions: [String])
     case shortTermGoal
     case goalValidation(message: String)
-    case moodCheckIn
-    case moodCheckIn2
-    case journal
-    case goalSetting
+    case journal(moodValue: Int)
+    case goalSetting(moodRating: Int)
     case historyCalendar
-
-
-
-
-
 }

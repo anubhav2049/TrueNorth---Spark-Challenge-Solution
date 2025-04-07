@@ -15,4 +15,5 @@ struct DailyEntry: Identifiable {
     var journal: String
     var feeling: String
     var goals: [Goal]
+    var moodRating: Int
 }

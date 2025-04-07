@@ -5,33 +5,48 @@ struct GoalValidationView: View {
     @Binding var path: NavigationPath
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("AI Feedback")
-                .font(.title)
+        ZStack{
+            LinearGradient(
+                                colors: [Color(hex:"#FFA8FF"), Color(hex:"#A7B0FF")],
+                                    startPoint: .trailing,
+                                    endPoint: .leading
+                                )
+                                .ignoresSafeArea()
 
-            Text(message)
+
+
+            VStack(spacing: 20) {
+                Text("AI Feedback")
+                    .font(.title)
+                    .foregroundColor(.white)
+                
+                Text(message)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(10)
+                
+                Text("I hope you have more clarity about the situation.")
+                    .font(.footnote)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                
+               
+                
+                Button("Back To Main Menu") {
+                    path.removeLast(path.count) // ✅ Reset to ContentView
+                }
+                .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.gray.opacity(0.1))
+                .background(Color(hex: "#908DFF"))
+                .foregroundColor(.white)
                 .cornerRadius(10)
-
-            Text("I hope you have more clarity about the situation.")
-                .font(.footnote)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-
-            Spacer()
-            
-            Button("Continue") {
-                            path.removeLast(path.count) // ✅ Reset to ContentView
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Validation")
         }
-        .padding()
-        .navigationTitle("Validation")
     }
 }
 

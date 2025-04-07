@@ -16,11 +16,13 @@ struct AISuggestionView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 20) {
-                Text("AI Suggestion")
+                Text("AI Summary")
                     .font(.title)
+                    .foregroundColor(Color.white)
                 
                 Text(suggestion)
                     .padding()
+                    .foregroundColor(.white)
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(10)
                 

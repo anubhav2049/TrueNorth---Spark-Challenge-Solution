@@ -53,7 +53,7 @@ struct ExplanationView: View {
         }
     }
 
-    // MARK: - API Request
+    // MARK: - AI Request
     func getAISuggestion() {
         guard !explanation.isEmpty else { return }
         isLoading = true
@@ -92,12 +92,14 @@ struct ExplanationView: View {
             }
 
             if let error = error {
-                print("❌ Request error: \(error.localizedDescription)")
+                print("❌ Request error:", error.localizedDescription)
+                fallback()
                 return
             }
 
             guard let data = data else {
                 print("❌ No data received")
+                fallback()
                 return
             }
 
@@ -108,6 +110,7 @@ struct ExplanationView: View {
                   let message = choices.first?["message"] as? [String: Any],
                   let content = message["content"] as? String else {
                 print("❌ Failed to parse AI response")
+                fallback()
                 return
             }
 
@@ -115,6 +118,14 @@ struct ExplanationView: View {
                 path.append(Screen.suggestion(text: content))
             }
         }.resume()
+    }
+
+    // MARK: - Fallback
+    func fallback() {
+        let fallbackMessage = "We couldn't get a response, but you're doing your best. Take a deep breath and be kind to yourself."
+        DispatchQueue.main.async {
+            path.append(Screen.suggestion(text: fallbackMessage))
+        }
     }
 }
 

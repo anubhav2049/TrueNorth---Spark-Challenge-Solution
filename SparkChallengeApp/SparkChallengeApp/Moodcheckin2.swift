@@ -12,33 +12,47 @@ struct Moodcheckin2: View {
     @Binding var path: NavigationPath
 
     var body: some View {
-        VStack(spacing: 30) {
-            Text("How are you feeling today?")
-                .font(.title2)
-                .padding()
+        ZStack{
+            LinearGradient(
+                                colors: [Color(hex:"#FDFF7E"), Color(hex:"#FFB5AF")],
+                                    startPoint: .trailing,
+                                    endPoint: .leading
+                                )
+                                .ignoresSafeArea()
 
-            Text("\(moodValue)")
-                .font(.system(size: 64))
-                .fontWeight(.bold)
 
-            Slider(value: Binding(
-                get: { Double(self.moodValue) },
-                set: { self.moodValue = Int($0) }
-            ), in: 1...10, step: 1)
+            
+            
+            VStack(spacing: 30) {
+                Text("How are you feeling today?")
+                    .font(.title2)
+                    .   foregroundColor(.white)
+                    .padding()
+                
+                Text("\(moodValue)")
+                    .font(.system(size: 64))
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+                
+                Slider(value: Binding(
+                    get: { Double(self.moodValue) },
+                    set: { self.moodValue = Int($0) }
+                ), in: 1...10, step: 1)
                 .padding(.horizontal)
-
-            Button("Continue") {
-                path.append(Screen.journal)
+                
+                Button("Continue") {
+                    path.append(Screen.journal(moodValue: moodValue))
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(hex: "#FF8B6C"))
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .padding(.horizontal)
             }
             .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding(.horizontal)
+            .navigationTitle("Daily Check-In")
         }
-        .padding()
-        .navigationTitle("Daily Check-In")
     }
 }
 

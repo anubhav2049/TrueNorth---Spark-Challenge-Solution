@@ -15,7 +15,7 @@ struct CheckboxToggleStyle: ToggleStyle {
         }) {
             HStack {
                 Image(systemName: configuration.isOn ? "checkmark.square.fill" : "square")
-                    .foregroundColor(configuration.isOn ? .blue : .gray)
+                    .foregroundColor(.white)
                     .imageScale(.large)
                 configuration.label
             }

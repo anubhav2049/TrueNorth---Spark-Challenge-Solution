@@ -6,72 +6,97 @@ struct ShortTermGoalView: View {
     @Binding var path: NavigationPath
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Set a Short-Term Goal")
-                .font(.title2)
+        ZStack {
+            LinearGradient(
+                colors: [Color(hex: "#FFA8FF"), Color(hex: "#A7B0FF")],
+                startPoint: .trailing,
+                endPoint: .leading
+            )
+            .ignoresSafeArea()
 
-            Text("What’s one small thing you can try to accomplish today or this week?")
-                .multilineTextAlignment(.center)
+            VStack(spacing: 20) {
+                Text("Set a Short-Term Goal")
+                    .font(.title2)
+                    .foregroundColor(.white)
 
-            TextEditor(text: $goal)
-                .frame(height: 100)
+                Text("What’s one small thing you can try to accomplish today or this week?")
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.white)
+
+                TextEditor(text: $goal)
+                    .frame(height: 100)
+                    .padding()
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.blue.opacity(0.4), lineWidth: 1)
+                    )
+
+                if isLoading {
+                    ProgressView("Asking AI...")
+                }
+
+                Button("Continue") {
+                    getAIValidation()
+                }
+                .disabled(goal.isEmpty || isLoading)
+                .frame(maxWidth: .infinity)
                 .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.blue.opacity(0.4), lineWidth: 1)
-                )
+                .background(goal.isEmpty || isLoading ? Color.gray : Color(hex: "#908DFF"))
+                .foregroundColor(.white)
+                .cornerRadius(10)
 
-            if isLoading {
-                ProgressView("Asking AI...")
+                Spacer()
             }
-
-            Button("Continue") {
-                getAIValidation()
-            }
-            .disabled(goal.isEmpty || isLoading)
-            .frame(maxWidth: .infinity)
             .padding()
-            .background(goal.isEmpty || isLoading ? Color.gray : Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-
-            Spacer()
+            .navigationTitle("Your Goal")
         }
-        .padding()
-        .navigationTitle("Your Goal")
     }
 
+    // MARK: - OpenAI API Call (matches ExplanationView)
     func getAIValidation() {
         isLoading = true
 
-        let url = URL(string: "https://models.inference.ai.azure.com/chat/completions")!
+        let token = "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"
+        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-
-        let token = "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" // ← Replace with your actual key
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("gpt-4o", forHTTPHeaderField: "x-ms-model-mesh-model-name")
 
         let prompt = """
         A user set the following short-term goal: "\(goal)".
-        Respond in 1–2 sentences validating or encouraging it as a supportive mental health assistant.
+        Respond in 1–2 encouraging sentences validating this goal as a helpful assistant.
         """
 
-        let body: [String: Any] = [
-            "messages": [
-                ["role": "system", "content": "You are a warm, supportive mental health assistant who encourages users."],
-                ["role": "user", "content": prompt]
-            ],
-            "temperature": 0.8,
-            "top_p": 1.0,
-            "max_tokens": 100
+        let messages: [[String: String]] = [
+            ["role": "system", "content": "You are a warm and supportive mental health assistant. Keep your response under 100 words."],
+            ["role": "user", "content": prompt]
         ]
 
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        let body: [String: Any] = [
+            "model": "gpt-3.5-turbo",
+            "messages": messages,
+            "temperature": 0.8,
+            "top_p": 1.0,
+            "max_tokens": 150
+        ]
 
-        URLSession.shared.dataTask(with: request) { data, _, _ in
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        } catch {
+            print("❌ JSON encoding failed:", error)
+            fallbackAndContinue()
+            return
+        }
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
             DispatchQueue.main.async { isLoading = false }
+
+            if let error = error {
+                print("❌ Request error:", error.localizedDescription)
+                fallbackAndContinue()
+                return
+            }
 
             guard let data = data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -79,6 +104,7 @@ struct ShortTermGoalView: View {
                   let message = choices.first?["message"] as? [String: Any],
                   let content = message["content"] as? String else {
                 print("❌ Failed to parse AI response")
+                fallbackAndContinue()
                 return
             }
 
@@ -86,6 +112,14 @@ struct ShortTermGoalView: View {
                 path.append(Screen.goalValidation(message: content))
             }
         }.resume()
+    }
+
+    // MARK: - Fallback if AI fails
+    func fallbackAndContinue() {
+        let message = "That sounds like a thoughtful and manageable goal. Taking even a small step can make a big difference. 😊"
+        DispatchQueue.main.async {
+            path.append(Screen.goalValidation(message: message))
+        }
     }
 }
 
