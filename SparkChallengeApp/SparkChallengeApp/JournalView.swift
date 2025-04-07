@@ -13,7 +13,7 @@ struct JournalView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [Color(hex:"#FDFF7E"), Color(hex:"#FFB5AF")],
+                colors: [Color(hex:"#82FF98"), Color(hex:"#FFB5AF")],
                 startPoint: .trailing,
                 endPoint: .leading
             )
