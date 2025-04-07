@@ -16,7 +16,7 @@ struct MenuView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 30) {
-                    Text("Welcome to Spark")
+                    Text("True North")
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.white)
